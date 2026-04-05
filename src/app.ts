@@ -60,6 +60,10 @@ app.use(
 
 app.use('/uploads', express.static(uploadDir));
 
+app.get('/', (req, res) => {
+  res.send('Server is running 🚀');
+});
+
 app.get('/api/v1/health', (_req, res) => {
   res.json({ status: 'ok' });
 });
