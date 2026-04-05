@@ -14,6 +14,18 @@ import { errorHandler, notFound } from './middleware/error';
 
 export const app = express();
 
+const escapeRegex = (value: string) =>
+  value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+const isAllowedOrigin = (origin: string) =>
+  env.allowedOrigins.some((allowedOrigin) => {
+    if (allowedOrigin === origin) return true;
+    if (!allowedOrigin.includes('*')) return false;
+
+    const pattern = `^${escapeRegex(allowedOrigin).replace(/\\\*/g, '.*')}$`;
+    return new RegExp(pattern).test(origin);
+  });
+
 app.use(helmet());
 app.use(
   cors({
@@ -23,7 +35,7 @@ app.use(
         return;
       }
 
-      if (!origin || env.allowedOrigins.includes(origin)) {
+      if (!origin || isAllowedOrigin(origin)) {
         callback(null, true);
         return;
       }

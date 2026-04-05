@@ -18,6 +18,15 @@ const comments_1 = __importDefault(require("./routes/comments"));
 const reactions_1 = __importDefault(require("./routes/reactions"));
 const error_1 = require("./middleware/error");
 exports.app = (0, express_1.default)();
+const escapeRegex = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const isAllowedOrigin = (origin) => env_1.env.allowedOrigins.some((allowedOrigin) => {
+    if (allowedOrigin === origin)
+        return true;
+    if (!allowedOrigin.includes('*'))
+        return false;
+    const pattern = `^${escapeRegex(allowedOrigin).replace(/\\\*/g, '.*')}$`;
+    return new RegExp(pattern).test(origin);
+});
 exports.app.use((0, helmet_1.default)());
 exports.app.use((0, cors_1.default)({
     origin: (origin, callback) => {
@@ -25,7 +34,7 @@ exports.app.use((0, cors_1.default)({
             callback(null, true);
             return;
         }
-        if (!origin || env_1.env.allowedOrigins.includes(origin)) {
+        if (!origin || isAllowedOrigin(origin)) {
             callback(null, true);
             return;
         }

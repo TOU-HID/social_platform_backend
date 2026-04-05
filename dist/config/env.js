@@ -6,6 +6,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.env = void 0;
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
+const toBoolean = (value, fallback = false) => {
+    if (typeof value === 'undefined')
+        return fallback;
+    const normalized = value.trim().toLowerCase();
+    return normalized === 'true' || normalized === '1' || normalized === 'yes';
+};
 const get = (key, fallback) => {
     const value = process.env[key] ?? fallback;
     if (!value) {
@@ -17,7 +23,7 @@ exports.env = {
     port: Number(process.env.PORT || 5000),
     mongodbUri: get('MONGODB_URI'),
     clientOrigin: get('CLIENT_ORIGIN', 'http://localhost:5173'),
-    allowAllOrigins: (process.env.ALLOW_ALL_ORIGINS || 'false').toLowerCase() === 'true',
+    allowAllOrigins: toBoolean(process.env.ALLOW_ALL_ORIGINS, false),
     allowedOrigins: get('CLIENT_ORIGIN', 'http://localhost:5173')
         .split(',')
         .map((value) => value.trim())
@@ -26,7 +32,7 @@ exports.env = {
     refreshTokenSecret: get('REFRESH_TOKEN_SECRET'),
     accessTokenExpiresIn: get('ACCESS_TOKEN_EXPIRES_IN', '15m'),
     refreshTokenExpiresIn: get('REFRESH_TOKEN_EXPIRES_IN', '7d'),
-    useCloudinary: (process.env.USE_CLOUDINARY || 'false').toLowerCase() === 'true',
+    useCloudinary: toBoolean(process.env.USE_CLOUDINARY, false),
     cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME || '',
     cloudinaryApiKey: process.env.CLOUDINARY_API_KEY || '',
     cloudinaryApiSecret: process.env.CLOUDINARY_API_SECRET || '',
