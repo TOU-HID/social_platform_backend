@@ -21,6 +21,10 @@ exports.app = (0, express_1.default)();
 exports.app.use((0, helmet_1.default)());
 exports.app.use((0, cors_1.default)({
     origin: (origin, callback) => {
+        if (env_1.env.allowAllOrigins) {
+            callback(null, true);
+            return;
+        }
         if (!origin || env_1.env.allowedOrigins.includes(origin)) {
             callback(null, true);
             return;
