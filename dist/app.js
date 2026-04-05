@@ -18,23 +18,10 @@ const comments_1 = __importDefault(require("./routes/comments"));
 const reactions_1 = __importDefault(require("./routes/reactions"));
 const error_1 = require("./middleware/error");
 exports.app = (0, express_1.default)();
-const escapeRegex = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-const isAllowedOrigin = (origin) => env_1.env.allowedOrigins.some((allowedOrigin) => {
-    if (allowedOrigin === origin)
-        return true;
-    if (!allowedOrigin.includes('*'))
-        return false;
-    const pattern = `^${escapeRegex(allowedOrigin).replace(/\\\*/g, '.*')}$`;
-    return new RegExp(pattern).test(origin);
-});
 exports.app.use((0, helmet_1.default)());
 exports.app.use((0, cors_1.default)({
     origin: (origin, callback) => {
-        if (env_1.env.allowAllOrigins) {
-            callback(null, true);
-            return;
-        }
-        if (!origin || isAllowedOrigin(origin)) {
+        if (!origin || origin === env_1.env.clientOrigin) {
             callback(null, true);
             return;
         }
@@ -52,6 +39,9 @@ exports.app.use('/api/v1/auth', (0, express_rate_limit_1.default)({
     limit: 200,
 }));
 exports.app.use('/uploads', express_1.default.static(paths_1.uploadDir));
+exports.app.get('/', (req, res) => {
+    res.send('Server is running 🚀');
+});
 exports.app.get('/api/v1/health', (_req, res) => {
     res.json({ status: 'ok' });
 });

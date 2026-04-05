@@ -20,11 +20,6 @@ export const env = {
   port: Number(process.env.PORT || 5000),
   mongodbUri: get('MONGODB_URI'),
   clientOrigin: get('CLIENT_ORIGIN', 'http://localhost:5173'),
-  allowAllOrigins: toBoolean(process.env.ALLOW_ALL_ORIGINS, false),
-  allowedOrigins: get('CLIENT_ORIGIN', 'http://localhost:5173')
-    .split(',')
-    .map((value) => value.trim())
-    .filter(Boolean),
   accessTokenSecret: get('ACCESS_TOKEN_SECRET'),
   refreshTokenSecret: get('REFRESH_TOKEN_SECRET'),
   accessTokenExpiresIn: get('ACCESS_TOKEN_EXPIRES_IN', '15m'),
