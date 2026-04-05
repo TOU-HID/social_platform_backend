@@ -14,15 +14,31 @@ import { errorHandler, notFound } from './middleware/error';
 
 export const app = express();
 
+const normalizeOrigin = (value: string) => {
+  try {
+    return new URL(value.trim()).origin;
+  } catch {
+    return value.trim().replace(/\/+$/, '');
+  }
+};
+
+const allowedOrigin = normalizeOrigin(env.clientOrigin);
+
 app.use(helmet());
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin || origin === env.clientOrigin) {
+      if (!origin) {
         callback(null, true);
         return;
       }
-      callback(new Error(`Origin not allowed by CORS: ${origin}`));
+
+      if (normalizeOrigin(origin) === allowedOrigin) {
+        callback(null, true);
+        return;
+      }
+
+      callback(null, false);
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],

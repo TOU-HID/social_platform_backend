@@ -33,10 +33,12 @@ const upload = (0, multer_1.default)({
     },
     limits: { fileSize: 5 * 1024 * 1024 },
 });
+const isProduction = process.env.NODE_ENV === 'production';
+const refreshCookieSameSite = isProduction ? 'none' : 'lax';
 const refreshCookieOptions = {
     httpOnly: true,
-    secure: false,
-    sameSite: 'lax',
+    secure: isProduction,
+    sameSite: refreshCookieSameSite,
     path: '/api/v1/auth',
 };
 router.post('/register', async (req, res) => {

@@ -39,10 +39,13 @@ const upload = multer({
   limits: { fileSize: 5 * 1024 * 1024 },
 });
 
+const isProduction = process.env.NODE_ENV === 'production';
+const refreshCookieSameSite: 'lax' | 'none' = isProduction ? 'none' : 'lax';
+
 const refreshCookieOptions = {
   httpOnly: true,
-  secure: false,
-  sameSite: 'lax' as const,
+  secure: isProduction,
+  sameSite: refreshCookieSameSite,
   path: '/api/v1/auth',
 };
 
