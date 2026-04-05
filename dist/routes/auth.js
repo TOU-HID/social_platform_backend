@@ -46,22 +46,18 @@ router.post('/register', async (req, res) => {
             .status(400)
             .json({ message: 'Invalid payload', errors: parsed.error.issues });
     }
-    const { firstName, lastName, email, password, repeatPassword } = parsed.data;
-    if (repeatPassword && password !== repeatPassword) {
+    const { firstName, lastName, email, password, confirmPassword } = parsed.data;
+    if (password !== confirmPassword) {
         return res.status(400).json({ message: 'Passwords do not match' });
     }
-    const normalizedFirstName = firstName && firstName.trim().length >= 2
-        ? firstName.trim()
-        : email.split('@')[0].slice(0, 20) || 'User';
-    const normalizedLastName = lastName && lastName.trim().length >= 2 ? lastName.trim() : 'Account';
     const existing = await User_1.UserModel.findOne({ email });
     if (existing) {
         return res.status(409).json({ message: 'Email already exists' });
     }
     const passwordHash = await bcryptjs_1.default.hash(password, 10);
     const user = await User_1.UserModel.create({
-        firstName: normalizedFirstName,
-        lastName: normalizedLastName,
+        firstName,
+        lastName,
         email,
         passwordHash,
     });

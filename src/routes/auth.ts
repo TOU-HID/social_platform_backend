@@ -54,18 +54,11 @@ router.post('/register', async (req, res) => {
       .json({ message: 'Invalid payload', errors: parsed.error.issues });
   }
 
-  const { firstName, lastName, email, password, repeatPassword } = parsed.data;
+  const { firstName, lastName, email, password, confirmPassword } = parsed.data;
 
-  if (repeatPassword && password !== repeatPassword) {
+  if (password !== confirmPassword) {
     return res.status(400).json({ message: 'Passwords do not match' });
   }
-
-  const normalizedFirstName =
-    firstName && firstName.trim().length >= 2
-      ? firstName.trim()
-      : email.split('@')[0].slice(0, 20) || 'User';
-  const normalizedLastName =
-    lastName && lastName.trim().length >= 2 ? lastName.trim() : 'Account';
 
   const existing = await UserModel.findOne({ email });
   if (existing) {
@@ -74,8 +67,8 @@ router.post('/register', async (req, res) => {
 
   const passwordHash = await bcrypt.hash(password, 10);
   const user = await UserModel.create({
-    firstName: normalizedFirstName,
-    lastName: normalizedLastName,
+    firstName,
+    lastName,
     email,
     passwordHash,
   });
